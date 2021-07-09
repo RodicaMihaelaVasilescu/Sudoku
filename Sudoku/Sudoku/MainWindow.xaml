@@ -1,0 +1,26 @@
+﻿<Window
+  x:Class="Sudoku.MainWindow"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:Sudoku.View"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:Sudoku"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  Title="MainWindow"
+  Width="800"
+  Height="800"
+  Background="Black"
+  WindowState="Maximized"
+  mc:Ignorable="d">
+
+  <StackPanel Margin="10">
+    <Label
+      Margin="0,10"
+      HorizontalContentAlignment="Center"
+      Background="#223761"
+      Content="Sudoku"
+      FontSize="30"
+      Foreground="White" />
+    <controls:SudokuView x:Name="SudokuView" />
+  </StackPanel>
+</Window>
