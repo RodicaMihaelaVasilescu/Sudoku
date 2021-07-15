@@ -24,7 +24,6 @@ namespace Sudoku
     public MainWindow()
     {
       InitializeComponent();
-      SudokuView.DataContext = new SudokuViewModel();
     }
 
   }

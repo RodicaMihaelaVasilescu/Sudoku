@@ -15,6 +15,7 @@ namespace Sudoku.Helper
   {
     public List<Cell> unknownCells;
     public List<List<int>> sudoku;
+
     public bool IsValidNumber(Cell nr, List<List<int>> sudoku)
     {
 
@@ -57,6 +58,7 @@ namespace Sudoku.Helper
     {
       sudoku = sudokuParameter;
       int index = 0;
+
 
       unknownCells = GetUnknownCells(sudoku);
       sudoku[unknownCells[index].line][unknownCells[index].column] = 0;

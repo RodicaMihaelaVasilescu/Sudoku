@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sudoku.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,15 @@ namespace Sudoku.View
   /// </summary>
   public partial class SudokuView : UserControl
   {
+   
+    private SudokuViewModel viewModel;
+
     public SudokuView()
     {
       InitializeComponent();
+      viewModel = new SudokuViewModel();
+      DataContext = viewModel;
     }
+
   }
 }

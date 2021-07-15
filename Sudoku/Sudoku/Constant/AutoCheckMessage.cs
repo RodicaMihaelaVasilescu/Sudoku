@@ -8,7 +8,8 @@ namespace Sudoku.Constant
 {
   public static class AutoCheckMessage
   {
-    public static string On = "Auto Checker - On ✔️";
+    public static string On = "Auto Check";
+    //public static string On = "Auto Checker - On ✔️";
     public static string Off = "Auto Checker - Off ❌";
 
   }

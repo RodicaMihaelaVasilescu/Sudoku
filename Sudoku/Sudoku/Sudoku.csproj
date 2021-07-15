@@ -36,6 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>sudoku.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MaterialDesignColors, Version=2.0.1.2556, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.2.0.1\lib\net452\MaterialDesignColors.dll</HintPath>
@@ -67,9 +70,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\AutoCheckMessage.cs" />
+    <Compile Include="Constant\LayoutConstants.cs" />
     <Compile Include="Converter\IntToStringConverter.cs" />
+    <Compile Include="Helper\MatrixManager.cs" />
     <Compile Include="Helper\SudokuSolver.cs" />
     <Compile Include="Model\Square.cs" />
+    <Compile Include="SudokuSamples\SudokuConfigurations.cs" />
     <Compile Include="ViewModel\ImportSudokuViewModel.cs" />
     <Compile Include="ViewModel\SudokuViewModel.cs" />
     <Compile Include="View\ImportSudokuView.xaml.cs">
@@ -126,9 +132,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Resource Include="SudokuSamples\sudoku.txt" />
+    <Resource Include="sudoku.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.1.0\build\MaterialDesignThemes.targets')" />

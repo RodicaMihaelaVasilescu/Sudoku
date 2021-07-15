@@ -5,24 +5,19 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows;
-using System.IO;
 using Sudoku.Helper;
 using Sudoku.View;
 using Sudoku.Constant;
+using Sudoku.SudokuSamples;
 
 namespace Sudoku.ViewModel
 {
   class SudokuViewModel : INotifyPropertyChanged
   {
-    int n = 9;
-    private readonly string textPath = @"..\..\SudokuSamples\sudoku.txt";
+    const int N = 9;
     public ObservableCollection<ObservableCollection<Square>> Board
     {
       get { return _board; }
@@ -46,13 +41,12 @@ namespace Sudoku.ViewModel
         _selectedSquare = value;
         if (SelectedSquare != null)
         {
-          SelectedSquareChanged();
+          //SelectedSquareChanged();
         }
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedSquare"));
       }
 
     }
-
     public string AutoCheckButtonContent
     {
       get { return _autoCheckButtonContent; }
@@ -66,7 +60,6 @@ namespace Sudoku.ViewModel
 
     }
 
-
     public ICommand NewGameCommand { get; set; }
     public ICommand GetSolutionCommand { get; set; }
     public ICommand ClearSolutionCommand { get; set; }
@@ -75,13 +68,12 @@ namespace Sudoku.ViewModel
     public ICommand AutoCheckCommand { get; set; }
 
     private ObservableCollection<ObservableCollection<Square>> _board;
-
     private List<List<int>> intMatrix;
     private List<List<int>> solutionMatrix;
     private List<List<int>> initialSudoku;
     private string _autoCheckButtonContent = AutoCheckMessage.On;
     private Square _selectedSquare;
-
+    private int intialIndex;
     public event PropertyChangedEventHandler PropertyChanged;
 
     public SudokuViewModel()
@@ -92,8 +84,48 @@ namespace Sudoku.ViewModel
       ClearSolutionCommand = new DelegateCommand(ClearSolutionCommandExecute);
       ImportCommand = new DelegateCommand(ImportCommandExecute);
       AutoCheckCommand = new DelegateCommand(AutoCheckCommandExecute);
-      InitializeBoard(File.ReadAllText(textPath));
+      InitializeBoard(GetSudokuStringConfiguration());
 
+    }
+
+    private List<List<int>> GetSudokuStringConfiguration(string configuration = null)
+    {
+      if (configuration == null)
+      {
+        Random rand = new Random();
+        var sudokuSamples = SudokuConfigurations.GetConfigurations;
+        var index = rand.Next(sudokuSamples.Count());
+        return ParseFromStringToMatrix(sudokuSamples[index]);
+      }
+      else
+      {
+        return ParseFromStringToMatrix(configuration);
+      }
+    }
+
+    private List<List<int>> ParseFromStringToMatrix(string configuration)
+    {
+      configuration = configuration.Replace('\n', ' ');
+      configuration = configuration.Replace(" ", "");
+      var matrix = new List<List<int>>();
+
+      int index = 0;
+      for (int i = 0; i < N; i++)
+      {
+        List<int> list = new List<int>();
+        for (int j = 0; j < N; j++)
+        {
+          var number = 0;
+          if (configuration[index] > '0' && configuration[index] <= '9')
+          {
+            number = int.Parse(configuration[index].ToString());
+          }
+          list.Add(number);
+          index++;
+        }
+        matrix.Add(list);
+      }
+      return matrix;
     }
 
     private void AutoCheckCommandExecute()
@@ -113,15 +145,16 @@ namespace Sudoku.ViewModel
 
     private void SetStyleForAutoCheckerOn()
     {
-      for (int i = 0; i < n; i++)
+      for (int i = 0; i < N; i++)
       {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
         {
-          if (Board[i][j].IsReadOnly)
+          if (Board[i][j].IsReadOnly || Board[i][j].Number == 0)
           {
             continue;
           }
-          if (Board[i][j].Number != solutionMatrix[i][j] && Board[i][j].Number != 0)
+
+          if (Board[i][j].Number != solutionMatrix[i][j])
           {
             Board[i][j].Foreground = Brushes.Red;
           }
@@ -133,7 +166,6 @@ namespace Sudoku.ViewModel
       }
       RefreshBoard();
     }
-
     void RefreshBoard()
     {
       CollectionViewSource.GetDefaultView(Board).Refresh();
@@ -141,15 +173,15 @@ namespace Sudoku.ViewModel
 
     private void SetStyleForAutoCheckerOff()
     {
-      for (int i = 0; i < n; i++)
+      for (int i = 0; i < N; i++)
       {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
         {
           if (Board[i][j].IsReadOnly)
           {
             continue;
           }
-          Board[i][j].Foreground = Brushes.DarkGray;
+          Board[i][j].Foreground = LayoutConstants.DefaultForeground;
 
         }
       }
@@ -158,8 +190,7 @@ namespace Sudoku.ViewModel
 
     private void ImportCommandExecute()
     {
-      ReadFile(File.ReadAllText(textPath));
-      InitializeBoard(File.ReadAllText(textPath));
+      //InitializeBoard(File.ReadAllText(textPath));
     }
 
     private void ImportSudokuCommandExecute()
@@ -177,14 +208,14 @@ namespace Sudoku.ViewModel
 
     private void ImportSudokuInput(object sender, string e)
     {
-      InitializeBoard(e);
+      InitializeBoard(ParseFromStringToMatrix(e));
     }
 
     private void ClearSolutionCommandExecute()
     {
-      for (int i = 0; i < n; i++)
+      for (int i = 0; i < N; i++)
       {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
         {
           if (!Board[i][j].IsReadOnly)
             Board[i][j].Number = 0;
@@ -192,80 +223,48 @@ namespace Sudoku.ViewModel
       }
     }
 
-    private List<List<int>> GetCopyOfMatrix(List<List<int>> matrix)
-    {
-      var newMatrix = new List<List<int>>();
-      for (int i = 0; i < n; i++)
-      {
-        var line = new List<int>();
-        for (int j = 0; j < n; j++)
-        {
-          line.Add(matrix[i][j]);
-        }
-        newMatrix.Add(line);
-      }
-      return newMatrix;
-    }
-
     private void GetSolutionCommandExecute()
     {
-      for (int i = 0; i < n; i++)
+      for (int i = 0; i < N; i++)
       {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
         {
           if (!Board[i][j].IsReadOnly)
           {
             Board[i][j].Number = solutionMatrix[i][j]/*.ToString()*/;
-            Board[i][j].Foreground = Brushes.DarkGray;
+            Board[i][j].Foreground = LayoutConstants.DefaultForeground;
           }
         }
       }
       RefreshBoard();
     }
 
-    private void ReadFile(string input)
+    private void ReadFile(List<List<int>> initialSudoku)
     {
-      if (input == null)
-      {
-        return;
-      }
-
       Board = new ObservableCollection<ObservableCollection<Square>>();
-      intMatrix = new List<List<int>>();
-      for (int k = 0; k < n; k++)
-      {
-        intMatrix.Add(new List<int> { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-      }
+      intMatrix = MatrixService.GetCopyOfMatrix(initialSudoku);
 
-      int i = 0;
-      foreach (var row in input.Split('\n'))
+      for (int i = 0; i < N; i++)
       {
-        int j = 0;
         ObservableCollection<Square> line = new ObservableCollection<Square>();
-        foreach (var col in row.Trim().Split(' '))
+        for (int j = 0; j < N; j++)
         {
-          int number = int.Parse(col.Trim());
-          intMatrix[i][j] = number;
           var square = new Square
           {
-            Number = number,
+            Number = intMatrix[i][j],
             Line = i,
             Column = j,
-            Foreground = number == 0 ? Brushes.DarkGray : Brushes.Black,
-            IsReadOnly = number != 0,
-            BorderThickness = GetBorderThickness(i, j),
-            Background = GetBackground(i, j)
+            Tag = i * 10 + j,
+            Foreground = intMatrix[i][j] != 0 ? Brushes.Black : LayoutConstants.DefaultForeground,
+            IsReadOnly = intMatrix[i][j] != 0,
+            BorderThickness = LayoutConstants.GetBorderThickness(i, j),
+            Background = LayoutConstants.GetDefaultBackground(i, j)
           };
-
-          //square.NumberChanged += NumberChangedEvent;
+          //square.NumberChanged += SelectedSquareChanged;
           line.Add(square);
-          j++;
         }
         Board.Add(line);
-        i++;
       }
-      initialSudoku = GetCopyOfMatrix(intMatrix);
-
     }
 
     private void NumberChangedEvent(object sender, int e)
@@ -276,78 +275,41 @@ namespace Sudoku.ViewModel
 
     }
 
-    private void SelectedSquareChanged()
+    public void SelectedSquareChanged(int line, int column, int value)
     {
-      if (SelectedSquare.Number == 0)
-        return;
-      for (int i = 0; i < n; i++)
+      Board[line][column].Number = value;
+      for (int i = 0; i < N; i++)
       {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
         {
-          if (i == SelectedSquare.Line || j == SelectedSquare.Column)
+          if (i == line || j == column)
           {
             Board[i][j].Background = Brushes.LightGray;
           }
           else
           {
-            Board[i][j].Background = GetBackground(i, j);
+            Board[i][j].Background = LayoutConstants.GetDefaultBackground(i, j);
           }
 
         }
       }
+      //int x = SelectedSquare.Number;
+      //SelectedSquare.Number = -1;
+      //SelectedSquare.Number = x;
       RefreshBoard();
     }
 
     private void NewGameCommandExecute()
     {
-      InitializeBoard(File.ReadAllText(textPath));
+      InitializeBoard(GetSudokuStringConfiguration());
     }
 
-    public void InitializeBoard(string input)
+    public void InitializeBoard(List<List<int>> input)
     {
       ReadFile(input);
       SudokuSolver sudokuSolver = new SudokuSolver();
       solutionMatrix = sudokuSolver.GetSolution(intMatrix);
     }
 
-
-    private bool IsEnabled(int i, int j)
-    {
-      return i + j % 2 == 0;
-    }
-
-    private Brush GetBackground(int i, int j)
-    {
-      return (i < 3 && j >= 3 && j < 6 || i >= 3 && i < 6 && j < 3 || i >= 3 && i < 6 && j >= 6 || i >= 6 && j >= 3 && j < 6) ?
-            Brushes.AliceBlue :
-            Brushes.LightBlue;
-    }
-
-    private Thickness GetBorderThickness(int i, int j)
-    {
-      Thickness borderThickness = new Thickness(1, 1, 1, 1);
-      var thickness = 3;
-      if (i % 3 == 0)
-      {
-        borderThickness.Top = thickness;
-      }
-
-      if (i == n - 1)
-      {
-        borderThickness.Bottom = thickness;
-      }
-
-      if (j % 3 == 0)
-      {
-        borderThickness.Left = thickness;
-      }
-
-      if (j == n - 1)
-      {
-        borderThickness.Right = thickness;
-      }
-
-      return borderThickness;
-    }
   }
 }

@@ -17,7 +17,7 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Shadows.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
       </ResourceDictionary.MergedDictionaries>
-      <converter:IntToStringConverter x:Key="IntToStringConverter"/>
+      <converter:IntToStringConverter x:Key="IntToStringConverter" />
 
       <Style x:Key="NoItemHighlight" TargetType="{x:Type ListBoxItem}">
         <Setter Property="Template">
@@ -74,6 +74,7 @@
     <ListBox
       Name="OuterListBox"
       Grid.Row="2"
+      
       HorizontalAlignment="Center"
       VerticalAlignment="Center"
       Background="Transparent"
@@ -84,7 +85,7 @@
       <ListBox.ItemTemplate>
         <DataTemplate>
           <ListBox
-            Name="InnerListBox"
+            x:Name="InnerListBox"
             Margin="0"
             Background="Transparent"
             BorderThickness="0"
@@ -93,7 +94,7 @@
             ItemsSource="{Binding}">
             <ListBox.ItemsPanel>
               <ItemsPanelTemplate>
-                <VirtualizingStackPanel Orientation="Horizontal" />
+                <VirtualizingStackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
               </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
@@ -104,15 +105,17 @@
                   Margin="0"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
-                  CaretBrush="Transparent"
                   HorizontalContentAlignment="Center"
                   VerticalContentAlignment="Center"
                   Background="{Binding Background}"
                   BorderBrush="Navy"
                   BorderThickness="{Binding BorderThickness}"
+                  CaretBrush="Transparent"
                   Cursor="Hand"
+                  Focusable="True"
                   FontSize="35"
                   FontWeight="Bold"
+                  Tag="{Binding Tag}"
                   Foreground="{Binding Foreground}"
                   IsReadOnly="{Binding IsReadOnly}"
                   Text="{Binding Number, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntToStringConverter}}">
